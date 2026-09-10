@@ -1,0 +1,163 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: >
+  S3 bucket for the Bronze layer of the Data Lakehouse.
+  Intended for the ingestion of raw data from the ERP,
+  with Intelligent-Tiering for storage cost optimization
+  and security best practices.
+
+Parameters:
+
+  EnvironmentName:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: >
+      Target deployment environment. Used to identify the
+      environment associated with the Bronze bucket.
+
+  ArchiveAccessDays:
+    Type: Number
+    Default: 90
+    MinValue: 90
+    Description: >
+      Number of days of inactivity before objects are moved
+      to the Intelligent-Tiering Archive Access tier.
+
+  DeepArchiveAccessDays:
+    Type: Number
+    Default: 180
+    MinValue: 180
+    Description: >
+      Number of days of inactivity before objects are moved
+      to the Intelligent-Tiering Deep Archive Access tier.
+
+  NoncurrentVersionExpirationDays:
+    Type: Number
+    Default: 90
+    Description: >
+      Number of days after which noncurrent object versions
+      are automatically deleted.
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-09f1c50e74de97f70
+    Description: Subnet where the crawler EC2 instance will be deployed.
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-08226b7a86576d09a
+    Description: >
+      VPC where the crawler EC2 instance will be deployed.
+
+  AmiId:
+    Type: AWS::EC2::Image::Id
+    Default: ami-0f97bfe630038b936
+    Description: Amazon Linux 2023 ARM64 AMI.
+
+Resources:
+
+  BronzeBucket:
+    Type: AWS::S3::Bucket
+
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+
+    Properties:
+
+      BucketName: !Sub "lakehouse-bronze-${EnvironmentName}-${AWS::AccountId}"
+
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+      VersioningConfiguration:
+        Status: Enabled
+
+      IntelligentTieringConfigurations:
+
+        - Id: EntireBucketIntelligentTiering
+          Status: Enabled
+
+          Tierings:
+            - AccessTier: ARCHIVE_ACCESS
+              Days: !Ref ArchiveAccessDays
+
+            - AccessTier: DEEP_ARCHIVE_ACCESS
+              Days: !Ref DeepArchiveAccessDays
+
+      LifecycleConfiguration:
+
+        Rules:
+
+          - Id: ExpireNoncurrentVersions
+            Status: Enabled
+
+            NoncurrentVersionExpiration:
+              NoncurrentDays: !Ref NoncurrentVersionExpirationDays
+
+          - Id: AbortIncompleteMultipartUploads
+            Status: Enabled
+
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+
+      Tags:
+
+        - Key: Layer
+          Value: Bronze
+
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+        - Key: Project
+          Value: DataLakehouseMedallion
+
+        - Key: ManagedBy
+          Value: CloudFormation
+
+        - Key: DataSource
+          Value: ERP
+
+  CrawlerEC2:
+    Type: AWS::EC2::Instance
+
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: t4g.small
+      SubnetId: !Ref SubnetId
+  
+
+Outputs:
+
+  BronzeBucketName:
+    Description: Name of the Bronze S3 bucket
+    Value: !Ref BronzeBucket
+
+    Export:
+      Name: !Sub "${EnvironmentName}-BronzeBucketName"
+
+  BronzeBucketArn:
+    Description: ARN of the Bronze S3 bucket
+    Value: !GetAtt BronzeBucket.Arn
+
+    Export:
+      Name: !Sub "${EnvironmentName}-BronzeBucketArn"
+
+  BronzeBucketDomainName:
+    Description: Regional domain name of the Bronze bucket
+    Value: !GetAtt BronzeBucket.RegionalDomainName
