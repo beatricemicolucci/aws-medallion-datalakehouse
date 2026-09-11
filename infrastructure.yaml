@@ -1,10 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: >
-  S3 bucket for the Bronze layer of the Data Lakehouse.
-  Intended for the ingestion of raw data from the ERP,
-  with Intelligent-Tiering for storage cost optimization
-  and security best practices.
+  AWS infrastructure for the Data Lakehouse.
 
 Parameters:
 
@@ -42,23 +39,108 @@ Parameters:
       Number of days after which noncurrent object versions
       are automatically deleted.
 
-  SubnetId:
-    Type: AWS::EC2::Subnet::Id
-    Default: subnet-09f1c50e74de97f70
-    Description: Subnet where the crawler EC2 instance will be deployed.
+  VpcCidr:
+    Type: String
+    Default: 10.10.0.0/16
+    Description: IPv4 range used by the crawler VPC.
+  
+  PublicSubnetCidr:
+    Type: String
+    Default: 10.10.1.0/24
+    Description: IPv4 range for the EC2 public subnet
 
-  VpcId:
-    Type: AWS::EC2::VPC::Id
-    Default: vpc-08226b7a86576d09a
+  AllowedSshCidr:
+    Type: String
+    AllowedPattern: '^([0-9]{1,3}\.){3}[0-9]{1,3}/(3[0-2]|[12]?[0-9])$'
+    Description: Public IPv4 address allowed to connect to the EC2 through SSH.
+
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64
     Description: >
-      VPC where the crawler EC2 instance will be deployed.
+      Amazon Linux 2023 ARM64, automatically resolved to the latest available
+      version
 
-  AmiId:
-    Type: AWS::EC2::Image::Id
-    Default: ami-0f97bfe630038b936
-    Description: Amazon Linux 2023 ARM64 AMI.
+  InstanceType:
+    Type: String
+    Default: t4g.small
+    AllowedValues: [t4g.small, t4g.medium]
+    Description: ARM instance type.
 
 Resources:
+
+  CrawlerVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-crawler-vpc'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref CrawlerVpc
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref CrawlerVpc
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Ref PublicSubnetCidr
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-crawler-public-subnet'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref CrawlerVpc
+
+  DefaultInternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref CrawlerVpc
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref PublicRouteTable
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: s3:*
+            Resource:
+              - !GetAtt BronzeBucket.Arn
+              - !Sub '${BronzeBucket.Arn}/*'
+          - Sid: AllowAmazonLinux2023Packages
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub 'arn:${AWS::Partition}:s3:::al2023-repos-${AWS::Region}-de612dc2/*'
+
 
   BronzeBucket:
     Type: AWS::S3::Bucket
@@ -133,13 +215,100 @@ Resources:
         - Key: DataSource
           Value: ERP
 
+  BronzeGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: !Sub "bronze_${EnvironmentName}"
+        Description: Glue database for the Bronze layer of the Data Lakehouse.
+  
+
+  CrawlerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CrawlerS3AndGlueAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !GetAtt BronzeBucket.Arn
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub '${BronzeBucket.Arn}/*'
+              - Effect: Allow
+                Action:
+                  - glue:GetDatabase
+                  - glue:GetTable
+                  - glue:CreateTable
+                  - glue:UpdateTable
+                  - glue:GetPartitions
+                  - glue:GetPartition
+                  - glue:CreatePartition
+                Resource: '*'
+
+  CrawlerInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref CrawlerRole
+
+  CrawlerKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Sub '${AWS::StackName}-crawler-key'
+      KeyType: ed25519
+      KeyFormat: pem
+
+  CrawlerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SSH access only from AllowedSshCidr.
+      VpcId: !Ref CrawlerVpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedSshCidr
+      # Outbound access is needed for operating-system/npm updates. S3 access
+      # follows the gateway endpoint route and does not require a NAT Gateway.
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+
   CrawlerEC2:
     Type: AWS::EC2::Instance
-
     Properties:
-      ImageId: !Ref AmiId
-      InstanceType: t4g.small
-      SubnetId: !Ref SubnetId
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref CrawlerKeyPair
+      IamInstanceProfile: !Ref CrawlerInstanceProfile
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
+        - !Ref CrawlerSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp3
+            VolumeSize: 20
+            Encrypted: true
+            DeleteOnTermination: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-custom-crawler'
+        - Key: Project
+          Value: DataLakehouseMedallion
+        - Key: Environment
+          Value: !Ref EnvironmentName
   
 
 Outputs:
@@ -161,3 +330,17 @@ Outputs:
   BronzeBucketDomainName:
     Description: Regional domain name of the Bronze bucket
     Value: !GetAtt BronzeBucket.RegionalDomainName
+
+  GlueDatabaseName:
+    Value: !Ref BronzeGlueDatabase
+
+  CrawlerInstanceId:
+    Value: !Ref CrawlerEC2
+
+  CrawlerPublicIp:
+    Description: SSH with ec2-user only from the AllowedSshCidr address.
+    Value: !GetAtt CrawlerEC2.PublicIp
+
+  KeyPairId:
+    Description: Retrieve the private key from SSM at /ec2/keypair/<this-id> immediately after deployment.
+    Value: !GetAtt CrawlerKeyPair.KeyPairId
