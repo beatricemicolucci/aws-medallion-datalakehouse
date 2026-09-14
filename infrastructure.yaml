@@ -234,17 +234,26 @@ Resources:
             Principal:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
+
       Policies:
+
         - PolicyName: CrawlerS3AndGlueAccess
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
+
+              # Bronze bucket access for the custom crawler
               - Effect: Allow
-                Action: s3:ListBucket
+                Action:
+                  - s3:ListBucket
                 Resource: !GetAtt BronzeBucket.Arn
+
               - Effect: Allow
-                Action: s3:GetObject
+                Action:
+                  - s3:GetObject
                 Resource: !Sub '${BronzeBucket.Arn}/*'
+
+              # Existing Glue permissions used by the crawler
               - Effect: Allow
                 Action:
                   - glue:GetDatabase
@@ -255,6 +264,68 @@ Resources:
                   - glue:GetPartition
                   - glue:CreatePartition
                 Resource: '*'
+
+
+        - PolicyName: SilverLoaderAthenaAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+
+              # Athena query execution and monitoring
+              - Effect: Allow
+                Action:
+                  - athena:StartQueryExecution
+                  - athena:GetQueryExecution
+                  - athena:GetQueryResults
+                  - athena:StopQueryExecution
+                Resource: '*'
+
+              # Read Glue metadata for Bronze and Silver
+              - Effect: Allow
+                Action:
+                  - glue:GetDatabase
+                  - glue:GetTable
+                  - glue:GetTables
+                Resource: '*'
+
+              # Read Bronze data
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource: !GetAtt BronzeBucket.Arn
+
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub '${BronzeBucket.Arn}/*'
+
+              # Read and write Iceberg data in Silver
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource: !GetAtt SilverBucket.Arn
+
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub '${SilverBucket.Arn}/*'
+
+              # Store and retrieve Athena query results
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource: !GetAtt AthenaResultsBucket.Arn
+
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub '${AthenaResultsBucket.Arn}/*'
 
   CrawlerInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -309,7 +380,94 @@ Resources:
           Value: DataLakehouseMedallion
         - Key: Environment
           Value: !Ref EnvironmentName
-  
+
+  AthenaResultsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub athena-results-${EnvironmentName}-${AWS::AccountId}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireAthenaResults
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 7
+      Tags:
+        - Key: Purpose
+          Value: Athena-Query-Results
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  SilverBucket:
+    Type: AWS::S3::Bucket
+
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+
+    Properties:
+
+      BucketName: !Sub "lakehouse-silver-${EnvironmentName}-${AWS::AccountId}"
+
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+      VersioningConfiguration:
+        Status: Enabled
+
+      LifecycleConfiguration:
+        Rules:
+
+          - Id: AbortIncompleteMultipartUploads
+            Status: Enabled
+
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+
+      Tags:
+
+        - Key: Layer
+          Value: Silver
+
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+        - Key: Project
+          Value: DataLakehouseMedallion
+
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  SilverGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: !Sub "silver_${EnvironmentName}"
+        Description: Glue database for the Silver layer of the Data Lakehouse.
+    
 
 Outputs:
 
@@ -344,3 +502,25 @@ Outputs:
   KeyPairId:
     Description: Retrieve the private key from SSM at /ec2/keypair/<this-id> immediately after deployment.
     Value: !GetAtt CrawlerKeyPair.KeyPairId
+
+  AthenaResultsBucketName:
+    Description: Name of the S3 bucket used for Athena query results
+    Value: !Ref AthenaResultsBucket
+  
+  SilverBucketName:
+    Description: Name of the Silver S3 bucket
+    Value: !Ref SilverBucket
+
+    Export:
+      Name: !Sub "${EnvironmentName}-SilverBucketName"
+
+  SilverBucketArn:
+    Description: ARN of the Silver S3 bucket
+    Value: !GetAtt SilverBucket.Arn
+
+    Export:
+      Name: !Sub "${EnvironmentName}-SilverBucketArn"
+
+  SilverGlueDatabaseName:
+    Description: Name of the Glue database for the Silver layer
+    Value: !Ref SilverGlueDatabase
