@@ -129,12 +129,52 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
+
+          # Bronze access
           - Effect: Allow
             Principal: '*'
             Action: s3:*
             Resource:
               - !GetAtt BronzeBucket.Arn
               - !Sub '${BronzeBucket.Arn}/*'
+
+          # Silver access required by the loader
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource:
+              - !GetAtt SilverBucket.Arn
+
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
+            Resource:
+              - !Sub '${SilverBucket.Arn}/*'
+
+          # Athena query results
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource:
+              - !GetAtt AthenaResultsBucket.Arn
+
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
+            Resource:
+              - !Sub '${AthenaResultsBucket.Arn}/*'
+
+          # Amazon Linux 2023 package repository
           - Sid: AllowAmazonLinux2023Packages
             Effect: Allow
             Principal: '*'
@@ -263,7 +303,17 @@ Resources:
                   - glue:GetPartitions
                   - glue:GetPartition
                   - glue:CreatePartition
+                  - glue:BatchCreatePartition
                 Resource: '*'
+
+              # Allow rebuild operations only on Silver tables
+              - Effect: Allow
+                Action:
+                  - glue:DeleteTable
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                  - !Sub 'arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:database/silver_${EnvironmentName}'
+                  - !Sub 'arn:${AWS::Partition}:glue:${AWS::Region}:${AWS::AccountId}:table/silver_${EnvironmentName}/*'
 
 
         - PolicyName: SilverLoaderAthenaAccess
@@ -380,6 +430,14 @@ Resources:
           Value: DataLakehouseMedallion
         - Key: Environment
           Value: !Ref EnvironmentName
+
+  CrawlerTestGlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: !Sub "crawler_test_${EnvironmentName}"
+        Description: Temporary Glue database for custom crawler testing.
 
   AthenaResultsBucket:
     Type: AWS::S3::Bucket
@@ -524,3 +582,7 @@ Outputs:
   SilverGlueDatabaseName:
     Description: Name of the Glue database for the Silver layer
     Value: !Ref SilverGlueDatabase
+
+  CrawlerTestGlueDatabaseName:
+    Description: Name of the temporary Glue database for crawler testing
+    Value: !Ref CrawlerTestGlueDatabase
