@@ -106,12 +106,18 @@ async function main() {
         continue;
       }
 
+      const partitionNameSet = new Set(partitionNames);
+
+      const tableColumns = columns.filter(
+        (column) => !partitionNameSet.has(column.Name),
+      );
+
       const result = await saveTable(
         glue,
         database,
         tableName,
         tableLocation,
-        columns,
+        tableColumns,
         partitionNames,
       );
 
@@ -126,7 +132,7 @@ async function main() {
         glue,
         database,
         tableName,
-        columns,
+        tableColumns,
         dataset.partitions,
       );
 
