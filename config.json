@@ -1,0 +1,162 @@
+{
+  "region": "eu-central-1",
+  "bronzeDatabase": "bronze_dev",
+  "silverDatabase": "silver_dev",
+  "silverBucket": "lakehouse-silver-dev-490874680158",
+  "athenaWorkgroup": "primary",
+  "athenaOutputLocation": "s3://athena-results-dev-490874680158/",
+
+  "dateValidation": {
+    "minTimestamp": "1900-01-01 00:00:00",
+    "maxYearsFromToday": 10,
+    "note": "Any row where ANY detected date/timestamp column falls outside the validation range is excluded entirely. The minimum bound is fixed at 1900-01-01. The maximum bound is dynamic and is calculated as today plus 10 years. Bounds are applied uniformly across all datasets. Date/timestamp columns are detected automatically from the Glue schema type."
+  },
+
+  "datasets": [
+    {
+      "name": "anaclienti",
+      "pk": ["clicodice"],
+      "cursor": "clidatam",
+      "mode": "dedupe_latest",
+      "excludeColumns": [
+        "clinscodfor",
+        "clisconto",
+        "clispincas"
+      ]
+    },
+    {
+      "name": "a_mis",
+      "pk": ["miscod"],
+      "cursor": "misdatam",
+      "mode": "dedupe_latest",
+      "excludeColumns": [
+        "misdim4",
+        "miscomtipo",
+        "misindconf",
+        "misindtipo",
+        "misindpal",
+        "misposiz",
+        "misforn",
+        "misdesc2",
+        "misevadi",
+        "miscatdog",
+        "misdurteorinox",
+        "mispzprodinox",
+        "misattrottinox",
+        "misdurteor",
+        "mispzprod",
+        "misattrott",
+        "misdisegno",
+        "misdispath",
+        "misprib",
+        "miscostostim",
+        "miscoeffcem",
+        "misltmin",
+        "misltmax",
+        "mislteco",
+        "mistipgest",
+        "misggriord",
+        "misumincons",
+        "misricm",
+        "misricc",
+        "misrics",
+        "misposiz2",
+        "miscostm",
+        "miscostc",
+        "miscosts",
+        "misivatipo",
+        "misforlav",
+        "misalt",
+        "misdesc1d",
+        "misdesc2d",
+        "misdesc1f",
+        "misdesc2f",
+        "misdesc1s",
+        "misdesc2s",
+        "gestitb",
+        "blkclamov",
+        "magavert",
+        "misnotaacqi",
+        "misnotaacqd",
+        "misnotaacqe",
+        "misnotaacqf",
+        "misnotaacqs",
+        "misriord_v"
+      ]
+    },
+    {
+      "name": "ordcli_t",
+      "pk": ["codice"],
+      "cursor": "odatam",
+      "mode": "dedupe_latest",
+      "excludeColumns": [
+        "imbprezzo",
+        "imbperc",
+        "ordca",
+        "tipolist",
+        "ordedi",
+        "cig",
+        "cup",
+        "nofbi",
+        "porperc",
+        "data_plafond",
+        "nostat",
+        "ordnomarc",
+        "ordbol",
+        "aggiunta"
+        ]
+    },
+    {
+      "name": "pallet_r",
+      "pk": ["palrid", "palrprog"],
+      "cursor": "palrdatam",
+      "mode": "dedupe_latest",
+      "excludeColumns": [
+        "palrsc2",
+        "palrsc3",
+        "palrsegno3",
+        "palrprezzotg",
+        "palrprezzotgum",
+        "palrspuntanc",
+        "palrnccod"
+      ]
+    },
+    {
+      "name": "pallet_t",
+      "pk": ["palid"],
+      "cursor": "paldatam",
+      "mode": "dedupe_latest",
+      "excludeColumns": [
+        "palautom",
+        "palcolor",
+        "palstetic",
+        "palurg"
+      ]
+    },
+    {
+      "name": "ordcli_r",
+      "pk": ["codicer", "riga", "rdatam"],
+      "cursor": "rdatam",
+      "mode": "append_only",
+      "requiresConfirmation": true,
+      "excludeColumns": [
+        "commessa",
+        "rigarif",
+        "prgrif",
+        "certif",
+        "przcertif",
+        "buonoprel",
+        "aumx",
+        "provag",
+        "prezzotgum",
+        "prezzotg",
+        "prevdev",
+        "flagatp",
+        "notaint",
+        "aumpmc",
+        "tipocertif"
+      ],
+      "note": "RDATAM è sia PK che cursor: ogni riga è un evento distinto, non una versione di un'entità mutabile. Nessuna deduplica per versione. Richiede conferma esplicita prima dell'esecuzione."
+    }
+  ]
+}
