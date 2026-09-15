@@ -155,6 +155,7 @@ function groupFilesByDataset(objects) {
         files: [],
         fileMetadata: new Map(),
         partitions: [],
+        partitionIds: new Set(),
         partitionNames: null,
       });
     }
@@ -185,12 +186,10 @@ function groupFilesByDataset(objects) {
     }
 
     const values = parsed.partitions.map((item) => item.value);
+    const partitionId = JSON.stringify(values);
 
-    const alreadyFound = dataset.partitions.some(
-      (item) => JSON.stringify(item.values) === JSON.stringify(values),
-    );
-
-    if (!alreadyFound) {
+    if (!dataset.partitionIds.has(partitionId)) {
+      dataset.partitionIds.add(partitionId);
       dataset.partitions.push({
         values,
         location: `s3://${bucket}/${parsed.partitionLocation}`,
