@@ -118,7 +118,7 @@ node src/index.js --dataset=a_mis --rebuild
   rilevata automaticamente dallo schema Glue (non serve elencarle a
   mano). Una riga viene **esclusa interamente** se una qualsiasi
   delle sue colonne data è fuori dal range configurato in
-  `dateValidation` (default: 1900-01-01 — oggi + 10 anni).
+  `dateValidation` (default: 1950-01-01 — oggi + 10 anni).
 
 - **Schema evolution**: se una tabella Silver esiste già e Bronze
   offre ora una colonna che prima era 100% NULL (quindi esclusa),

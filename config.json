@@ -7,9 +7,9 @@
   "athenaOutputLocation": "s3://athena-results-dev-490874680158/",
 
   "dateValidation": {
-    "minTimestamp": "1900-01-01 00:00:00",
+    "minTimestamp": "1950-01-01 00:00:00",
     "maxYearsFromToday": 10,
-    "note": "Any row where ANY detected date/timestamp column falls outside the validation range is excluded entirely. The minimum bound is fixed at 1900-01-01. The maximum bound is dynamic and is calculated as today plus 10 years. Bounds are applied uniformly across all datasets. Date/timestamp columns are detected automatically from the Glue schema type."
+    "note": "Any row where ANY detected date/timestamp column falls outside the validation range is excluded entirely. The minimum bound is fixed at 1950-01-01. The maximum bound is dynamic and is calculated as today plus 10 years. Bounds are applied uniformly across all datasets. Date/timestamp columns are detected automatically from the Glue schema type."
   },
 
   "datasets": [
@@ -118,7 +118,12 @@
         "palrprezzotg",
         "palrprezzotgum",
         "palrspuntanc",
-        "palrnccod"
+        "palrnccod",
+        "palrpf",
+        "palrscat",
+        "palrverifica",
+        "palrnbox",
+        "palrbox"
       ]
     },
     {
