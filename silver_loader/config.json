@@ -140,10 +140,10 @@
     },
     {
       "name": "ordcli_r",
-      "pk": ["codicer", "riga", "rdatam"],
+      "pk": ["codicer", "riga"],
       "cursor": "rdatam",
-      "mode": "append_only",
-      "requiresConfirmation": true,
+      "mode": "dedupe_latest",
+      "requiresConfirmation": false,
       "excludeColumns": [
         "commessa",
         "rigarif",
