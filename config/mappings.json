@@ -1,7 +1,7 @@
 {
   "settings": {
     "postgresSchema": "public",
-    "batchSize": 500,
+    "batchSize": 2500,
     "watermarkOverlapSeconds": 60
   },
   "tables": [
