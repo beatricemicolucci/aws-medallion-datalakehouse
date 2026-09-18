@@ -3,6 +3,8 @@ const assert = require('node:assert/strict');
 const {
     computeSafeBatchSize,
     buildUpsertSQL,
+    buildCopySQL,
+    buildMergeSQL,
     diffSchema,
     isCompatibleType
 } = require('../src/postgres');
@@ -76,6 +78,16 @@ test('buildUpsertSQL falls back to DO NOTHING when every column is part of the P
     const { sql } = buildUpsertSQL(allPkConfig, 'public', [{ a: '1', b: '2' }]);
     assert.match(sql, /DO NOTHING/);
     assert.doesNotMatch(sql, /DO UPDATE SET/);
+});
+
+test('COPY and merge SQL use the temporary staging table in the session schema', () => {
+    const copySql = buildCopySQL(sampleConfig, 'public', 'staging_rows');
+    const mergeSql = buildMergeSQL(sampleConfig, 'public', 'staging_rows');
+
+    assert.match(copySql, /^COPY "staging_rows"/);
+    assert.match(mergeSql, /FROM "staging_rows"/);
+    assert.doesNotMatch(copySql, /public.*staging_rows/);
+    assert.doesNotMatch(mergeSql, /public.*staging_rows/);
 });
 
 test('diffSchema detects columns to add, without flagging false mismatches', () => {
