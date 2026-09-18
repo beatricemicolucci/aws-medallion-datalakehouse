@@ -685,7 +685,7 @@
     {
       "sourceTable": "ordcli_r",
       "targetTable": "righe_ordini_cliente",
-      "primaryKeys": ["codice_ordine", "numero_riga", "data_modifica"],
+      "primaryKeys": ["codice_ordine", "numero_riga"],
       "watermark": {
         "enabled": true,
         "sourceColumn": "rdatam"
