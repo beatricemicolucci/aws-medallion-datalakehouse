@@ -1,0 +1,1470 @@
+{
+  "settings": {
+    "postgresSchema": "public",
+    "batchSize": 2500,
+    "watermarkOverlapSeconds": 60
+  },
+  "tables": [
+    {
+      "sourceTable": "anaclienti",
+      "targetTable": "anagrafica_clienti",
+      "primaryKeys": ["codice_cliente"],
+      "watermark": {
+        "enabled": true,
+        "sourceColumn": "clidatam"
+      },
+      "columns": [
+        {
+          "source": "clicodice",
+          "target": "codice_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clilingua",
+          "target": "lingua",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clivaluta",
+          "target": "valuta",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "climodpag",
+          "target": "modalita_pagamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clidecopag",
+          "target": "decorrenza_pagamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clidilapag",
+          "target": "dilazione_pagamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clibanca",
+          "target": "banca",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliageb",
+          "target": "agenzia_bancaria",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliivatipo",
+          "target": "tipo_iva",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliestrlett",
+          "target": "lettera_intenti",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clibol",
+          "target": "bollo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliagcod",
+          "target": "codice_agente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliprovag",
+          "target": "percentuale_provvigione_agente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clitipo",
+          "target": "tipo_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clicodoldsi",
+          "target": "codice_cliente_legacy",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clifido",
+          "target": "fido",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clitarget",
+          "target": "obiettivo_fatturato",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clicontocor",
+          "target": "conto_corrente",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliimbsupporto",
+          "target": "supporto_imballaggio",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "climodimb",
+          "target": "modalita_imballaggio",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliimbprezzo",
+          "target": "prezzo_imballaggio",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliimbperc",
+          "target": "percentuale_imballaggio",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliscontop",
+          "target": "percentuale_sconto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliblocco",
+          "target": "blocco_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliuser",
+          "target": "utente_modifica",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clidatam",
+          "target": "data_modifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "clitipolist",
+          "target": "codice_listino",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliswift",
+          "target": "codice_swift",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliiban",
+          "target": "iban",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clibic",
+          "target": "codice_bic",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliordbol",
+          "target": "esenzione_bollo_ordine",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clibloccofatt",
+          "target": "blocco_fatturazione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clifattnett",
+          "target": "fatturazione_netta",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clicin",
+          "target": "codice_cin",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clicertif",
+          "target": "cliente_certificato",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cligruppo",
+          "target": "gruppo_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cligruppo_stat",
+          "target": "gruppo_statistico",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliimportanz",
+          "target": "classe_importanza",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "cliabilitalistweb",
+          "target": "abilitazione_listino_web",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliabilitaoffweb",
+          "target": "abilitazione_offerte_web",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clipalletord",
+          "target": "gestione_pallet_ordinati",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cligiornodic",
+          "target": "giorni_chiusura_dicembre",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cligiornoago",
+          "target": "giorni_chiusura_agosto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliorigine",
+          "target": "origine_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clitipoluser",
+          "target": "tipo_utente",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clitipoldatam",
+          "target": "data_modifica_legacy",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "clifilepa",
+          "target": "codice_file_pa",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clievlottorig",
+          "target": "evasione_lotto_origine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliplafond",
+          "target": "plafond",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clidata_plafond",
+          "target": "data_plafond",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "cliannocomp",
+          "target": "anno_competenza",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliobso",
+          "target": "cliente_obsoleto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clievcompleta",
+          "target": "evasione_completa",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "cliragg_ric",
+          "target": "raggruppamento_ricevute",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "fido_data_rich",
+          "target": "data_richiesta_fido",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "fido_imp_rich",
+          "target": "importo_richiesto_fido",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "fido_data_ratif",
+          "target": "data_ratifica_fido",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "fido_imp_ratif",
+          "target": "importo_fido_concesso",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "fido_imp_allarme",
+          "target": "soglia_allarme_fido",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "fido_data_sosp",
+          "target": "data_sospensione_fido",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "fido_motivo_sosp",
+          "target": "motivo_sospensione_fido",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "fido_no_contr",
+          "target": "esclusione_controllo_fido",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "fido_note",
+          "target": "note_fido",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clidatacont",
+          "target": "data_contabile",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "cliindicepa",
+          "target": "indice_ipa",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clidatacli",
+          "target": "data_creazione_cliente",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "clitipocert",
+          "target": "tipo_certificazione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clipagpostmm1",
+          "target": "mese_pagamento_posticipato_1",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clipagpostgg1",
+          "target": "giorno_pagamento_posticipato_1",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clipagpostmm2",
+          "target": "mese_pagamento_posticipato_2",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clipagpostgg2",
+          "target": "giorno_pagamento_posticipato_2",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clibanco",
+          "target": "cliente_banco",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clisubagente",
+          "target": "codice_subagente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "accman1",
+          "target": "account_manager_principale",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "accman2",
+          "target": "account_manager_secondario",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clib2blist",
+          "target": "listino_b2b",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clib2bdispo",
+          "target": "disponibilita_b2b",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "clib2bmail",
+          "target": "email_b2b",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clib2bdatam",
+          "target": "data_modifica_b2b",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "clib2buserm",
+          "target": "utente_modifica_b2b",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clib2bmodinv",
+          "target": "modalita_invio_documenti_b2b",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "clib2bdtsinv",
+          "target": "data_invito_b2b",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "clihubspotid",
+          "target": "id_hubspot",
+          "postgresType": "DOUBLE PRECISION"
+        }
+      ]
+    },
+    {
+      "sourceTable": "a_mis",
+      "targetTable": "anagrafica_articolo",
+      "primaryKeys": ["codice_articolo"],
+      "watermark": {
+        "enabled": true,
+        "sourceColumn": "misdatam"
+      },
+      "columns": [
+        {
+          "source": "miscod",
+          "target": "codice_articolo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "miscodold",
+          "target": "codice_articolo_legacy",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "mistm",
+          "target": "marca",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "mistipo",
+          "target": "tipo_articolo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misclasse",
+          "target": "classe_articolo",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misclassesc",
+          "target": "descrizione_classe",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misinox",
+          "target": "materiale_inox",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misarticolo",
+          "target": "id_articolo",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misum",
+          "target": "unita_misura",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misumprz",
+          "target": "unita_misura_prezzo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "mismisure",
+          "target": "misure_articolo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misdim1",
+          "target": "diametro",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misdim2",
+          "target": "lunghezza",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misdim3",
+          "target": "passo_spessore",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "mispeso",
+          "target": "peso_unitario",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misnorma",
+          "target": "norma",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "miscomconf",
+          "target": "pezzi_per_confezione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "miscomqta",
+          "target": "quantita_standard",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "miscompal",
+          "target": "pezzi_per_pallet",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misindqta",
+          "target": "indice_quantita",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misdesc1",
+          "target": "descrizione_articolo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misobso",
+          "target": "articolo_obsoleto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misdiscad",
+          "target": "soggetto_a_sconto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misi",
+          "target": "descrizione_italiano",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misd",
+          "target": "descrizione_tedesco",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "mise",
+          "target": "descrizione_inglese",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misf",
+          "target": "descrizione_francese",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "miss",
+          "target": "descrizione_spagnolo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misuser",
+          "target": "utente_modifica",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misdatam",
+          "target": "data_modifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "miscodint",
+          "target": "codice_interno",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "miscontrol",
+          "target": "controllo_qualita",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misdesc1e",
+          "target": "descrizione_estesa_1",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "misdesc2e",
+          "target": "descrizione_estesa_2",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "abilitaweb",
+          "target": "abilitazione_web",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "przsugpercgap",
+          "target": "percentuale_scostamento_prezzo_suggerito",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "przsugmod",
+          "target": "data_modifica_prezzo_suggerito",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "gestitb_dt",
+          "target": "data_aggiornamento_gestione",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "gestitb_us",
+          "target": "utente_aggiornamento_gestione",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "przsugeccez",
+          "target": "eccezione_prezzo_suggerito",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misriord",
+          "target": "livello_riordino",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "misclamagg",
+          "target": "macro_classe",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "mispesoa2",
+          "target": "peso_secondario",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "blkclamovscad",
+          "target": "data_scadenza_blocco_movimentazione",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "miscfxbulk",
+          "target": "fattore_conversione_imballaggio_sfuso",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "mismoq",
+          "target": "quantita_minima_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "not_list_k",
+          "target": "data_esclusione_listino",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "clamovold",
+          "target": "classe_movimentazione_legacy",
+          "postgresType": "TEXT"
+        }
+      ]
+    },
+    {
+      "sourceTable": "ordcli_r",
+      "targetTable": "righe_ordini_cliente",
+      "primaryKeys": ["codice_ordine", "numero_riga"],
+      "watermark": {
+        "enabled": true,
+        "sourceColumn": "rdatam"
+      },
+      "columns": [
+        {
+          "source": "codicer",
+          "target": "codice_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "riga",
+          "target": "numero_riga",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "partic",
+          "target": "codice_parte",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "prodcod",
+          "target": "codice_articolo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "trtcod",
+          "target": "codice_trattamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "trgcod",
+          "target": "codice_destinazione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "confcod",
+          "target": "codice_confezione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "rifoff",
+          "target": "riferimento_offerta",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "rifoffr",
+          "target": "riga_offerta",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "qta",
+          "target": "quantita_ordinata",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "qtaum",
+          "target": "unita_misura_quantita",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "prezzo",
+          "target": "prezzo_unitario",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "prezzoum",
+          "target": "unita_misura_prezzo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "sc1",
+          "target": "sconto_1",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "sc2",
+          "target": "sconto_2",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "sc3",
+          "target": "sconto_3",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "segno3",
+          "target": "segno_sconto_3",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "stato",
+          "target": "stato_riga",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "evasionepz",
+          "target": "pezzi_evasione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "datacons",
+          "target": "data_consegna_richiesta",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "dataconf",
+          "target": "data_consegna_confermata",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "nota",
+          "target": "note",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "ruser",
+          "target": "utente_modifica",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "rdatam",
+          "target": "data_modifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "qtaeva",
+          "target": "quantita_evasa",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "antbloc",
+          "target": "stato_blocco",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "tipolistino",
+          "target": "tipo_listino",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "pz_acq",
+          "target": "prezzo_acquisto_unitario",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "tax",
+          "target": "codice_iva",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "pz_pmv",
+          "target": "prezzo_medio_vendita",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "pz_pms",
+          "target": "prezzo_medio_standard",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "dispo_web",
+          "target": "disponibilita_web",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "list_k",
+          "target": "fattore_listino",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "aumrs",
+          "target": "maggiorazione_prezzo",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "disaumrs",
+          "target": "sconto_maggiorazione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "pz_pmg",
+          "target": "costo_medio_gestione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "listx",
+          "target": "prezzo_listino",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "box",
+          "target": "numero_colli",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "iddispo",
+          "target": "id_disponibilita",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "camrid",
+          "target": "id_campagna",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "camrtcz",
+          "target": "sconto_campagna",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "dispo_qta",
+          "target": "quantita_disponibile",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "datainvmcorr",
+          "target": "data_documento",
+          "postgresType": "TIMESTAMP"
+        }
+      ]
+    },
+    {
+      "sourceTable": "ordcli_t",
+      "targetTable": "ordini_cliente",
+      "primaryKeys": ["codice_ordine"],
+      "watermark": {
+        "enabled": true,
+        "sourceColumn": "odatam"
+      },
+      "columns": [
+        {
+          "source": "codice",
+          "target": "codice_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "depo",
+          "target": "codice_deposito",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "indcodice",
+          "target": "codice_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "indanacod",
+          "target": "codice_indirizzo_consegna",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "datareg",
+          "target": "data_registrazione",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "tipord",
+          "target": "tipo_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "avanzamento",
+          "target": "stato_avanzamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "avanzuser",
+          "target": "utente_avanzamento",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "avanzdatam",
+          "target": "data_avanzamento",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "stato",
+          "target": "stato_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "rif",
+          "target": "riferimento_esterno",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "rifdata",
+          "target": "data_riferimento",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "valuta",
+          "target": "valuta",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "modpag",
+          "target": "modalita_pagamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "decopag",
+          "target": "decorrenza_pagamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "dilapag",
+          "target": "dilazione_pagamento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "banca",
+          "target": "banca",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "ageb",
+          "target": "agenzia_bancaria",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "ivatipo",
+          "target": "tipo_iva",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "estrlett",
+          "target": "lettera_intenti",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "bol",
+          "target": "bollo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "agcod",
+          "target": "codice_agente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "provag",
+          "target": "percentuale_provvigione_agente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "contocor",
+          "target": "conto_corrente",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "imbsupporto",
+          "target": "supporto_imballaggio",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "modimb",
+          "target": "modalita_imballaggio",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "sconto",
+          "target": "sconto_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "scontop",
+          "target": "percentuale_sconto_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "spincas",
+          "target": "spese_incasso",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "swift",
+          "target": "codice_swift",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "indvet1",
+          "target": "codice_trasportatore_1",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "anavet1",
+          "target": "codice_indirizzo_trasportatore_1",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "indvet2",
+          "target": "codice_trasportatore_2",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "anavet2",
+          "target": "codice_indirizzo_trasportatore_2",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "pgmsped",
+          "target": "codice_programma_spedizione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "spediz",
+          "target": "modalita_spedizione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "portipo",
+          "target": "tipo_trasporto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "portrf",
+          "target": "codice_calcolo_trasporto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "nota",
+          "target": "note_ordine",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "ouser",
+          "target": "utente_modifica",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "odatam",
+          "target": "data_modifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "notaint",
+          "target": "note_interne",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "xrate",
+          "target": "tasso_di_cambio",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "ordnetti",
+          "target": "ordine_netto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "vision",
+          "target": "controllo_visivo",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "condspedspec",
+          "target": "condizioni_spedizione_speciali",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "notaprel",
+          "target": "note_preparazione",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "notaprelprn",
+          "target": "stampa_note_preparazione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "bloccocondsped",
+          "target": "blocco_condizioni_spedizione",
+          "postgresType": "DOUBLE PRECISION"
+        }
+      ]
+    },
+    {
+      "sourceTable": "pallet_r",
+      "targetTable": "righe_pallet",
+      "primaryKeys": ["id_pallet", "progressivo_pallet"],
+      "watermark": {
+        "enabled": true,
+        "sourceColumn": "palrdatam"
+      },
+      "columns": [
+        {
+          "source": "palrid",
+          "target": "id_pallet",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrprog",
+          "target": "progressivo_pallet",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrdocid",
+          "target": "id_documento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrdocr",
+          "target": "riga_documento",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrnconf",
+          "target": "numero_non_conformita",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrlottoid",
+          "target": "id_lotto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrlottor",
+          "target": "riga_lotto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrart",
+          "target": "codice_articolo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "palrtt",
+          "target": "tipo_articolo",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrtg",
+          "target": "classe_articolo",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrcf",
+          "target": "codice_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrpc",
+          "target": "quantita_confezioni",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrqta",
+          "target": "quantita_pallet",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrkg",
+          "target": "peso_pallet",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrordcli",
+          "target": "codice_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrordclir",
+          "target": "riga_ordine",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrprezzo",
+          "target": "prezzo_unitario",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrprezzoum",
+          "target": "unita_misura_prezzo",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "palrsc1",
+          "target": "sconto_1",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palruser",
+          "target": "utente_modifica",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "palrdatam",
+          "target": "data_modifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palrspuntadt",
+          "target": "data_controllo_pallet",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palrcamrid",
+          "target": "id_campagna",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palrcamrtcz",
+          "target": "sconto_campagna",
+          "postgresType": "DOUBLE PRECISION"
+        }
+      ]
+    },
+    {
+      "sourceTable": "pallet_t",
+      "targetTable": "testate_pallet",
+      "primaryKeys": ["id_pallet"],
+      "watermark": {
+        "enabled": true,
+        "sourceColumn": "paldatam"
+      },
+      "columns": [
+        {
+          "source": "palid",
+          "target": "id_pallet",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "paldata",
+          "target": "data_pallet",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palanacod",
+          "target": "codice_cliente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palindcod",
+          "target": "codice_indirizzo_consegna",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palxabrif",
+          "target": "numero_riferimento_esterno",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palxabanno",
+          "target": "data_riferimento_esterno",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palplordo",
+          "target": "peso_lordo",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palpnetto",
+          "target": "peso_netto",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palconf",
+          "target": "quantita_confezioni",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palposiz",
+          "target": "posizione_magazzino",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "paluser",
+          "target": "utente_modifica",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "paldatam",
+          "target": "data_modifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "paldeposito",
+          "target": "codice_deposito",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palnota",
+          "target": "note",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "pallettura",
+          "target": "stato_pallettizzazione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "paldataqual",
+          "target": "data_controllo_qualita",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "paloperqual",
+          "target": "operatore_controllo_qualita",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palxabrifprv",
+          "target": "numero_riferimento_precedente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palxabdataprv",
+          "target": "data_riferimento_precedente",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palxabdatadecor",
+          "target": "data_decorrenza",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palspunta",
+          "target": "stato_verifica",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palspuntaop",
+          "target": "operatore_verifica",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palspuntaini",
+          "target": "inizio_verifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palspuntafin",
+          "target": "fine_verifica",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "palletturadt",
+          "target": "data_pallettizzazione",
+          "postgresType": "TIMESTAMP"
+        },
+        {
+          "source": "mzcolli",
+          "target": "quantita_colli",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palplordo_old",
+          "target": "peso_lordo_precedente",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palidmast",
+          "target": "id_pallet_master",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palclose",
+          "target": "stato_chiusura",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palsipi",
+          "target": "id_riferimento_preparazione",
+          "postgresType": "DOUBLE PRECISION"
+        },
+        {
+          "source": "palveruser",
+          "target": "utente_verifica",
+          "postgresType": "TEXT"
+        },
+        {
+          "source": "palverdatam",
+          "target": "data_verifica",
+          "postgresType": "TIMESTAMP"
+        }
+      ]
+    }
+  ]
+}
