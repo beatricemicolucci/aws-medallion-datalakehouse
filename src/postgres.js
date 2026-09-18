@@ -1,4 +1,5 @@
 const logger = require('./logger');
+const { from: copyFrom } = require('pg-copy-streams');
 
 function quoteIdentifier(identifier) {
     return '"' + identifier.replace(/"/g, '""') + '"';
@@ -272,11 +273,99 @@ async function upsertBatch(db, config, schema, rows) {
     await db.query(sql, values);
 }
 
+function buildCopySQL(config, schema, stagingTable) {
+    const columns = config.columns.map((column) => quoteIdentifier(column.target)).join(', ');
+    return `COPY ${quoteIdentifier(stagingTable)} (${columns}) FROM STDIN WITH (FORMAT csv, NULL '\\N')`;
+}
+
+function buildMergeSQL(config, schema, stagingTable) {
+    const columns = config.columns.map((column) => column.target);
+    const columnList = columns.map(quoteIdentifier).join(', ');
+    const pkSet = new Set(config.primaryKeys);
+    const updateColumns = columns
+        .filter((column) => !pkSet.has(column))
+        .map((column) => `${quoteIdentifier(column)} = EXCLUDED.${quoteIdentifier(column)}`);
+    const conflictAction =
+        updateColumns.length > 0
+            ? `DO UPDATE SET\n            ${updateColumns.join(',\n            ')}`
+            : 'DO NOTHING';
+
+    return `
+        INSERT INTO ${quoteIdentifier(schema)}.${quoteIdentifier(config.targetTable)} (${columnList})
+        SELECT ${columnList}
+        FROM ${quoteIdentifier(stagingTable)}
+        ON CONFLICT (${config.primaryKeys.map(quoteIdentifier).join(', ')})
+        ${conflictAction}
+    `;
+}
+
+function csvValue(value) {
+    if (value === null || value === undefined) return '\\N';
+    return `"${String(value).replace(/"/g, '""')}"`;
+}
+
+async function copyToStaging(client, config, schema, stagingTable, rows) {
+    const columns = config.columns.map((column) => quoteIdentifier(column.target)).join(', ');
+    await client.query(
+        `CREATE TEMP TABLE ${quoteIdentifier(stagingTable)} AS
+         SELECT ${columns} FROM ${quoteIdentifier(schema)}.${quoteIdentifier(config.targetTable)} WITH NO DATA`
+    );
+
+    const copyStream = client.query(copyFrom(buildCopySQL(config, schema, stagingTable)));
+    let totalRows = 0;
+
+    try {
+        for await (const row of rows) {
+            const line = config.columns.map((column) => csvValue(row[column.target])).join(',') + '\n';
+            if (!copyStream.write(line)) {
+                await new Promise((resolve, reject) => {
+                    copyStream.once('drain', resolve);
+                    copyStream.once('error', reject);
+                });
+            }
+            totalRows++;
+        }
+        copyStream.end();
+        await new Promise((resolve, reject) => {
+            copyStream.once('finish', resolve);
+            copyStream.once('error', reject);
+        });
+    } catch (err) {
+        copyStream.destroy(err);
+        throw err;
+    }
+
+    return totalRows;
+}
+
+async function copyAndMerge(db, config, schema, rows) {
+    const client = await db.connect();
+    const stagingTable = `gold_loader_staging_${process.pid}_${Date.now()}`;
+
+    try {
+        await client.query('BEGIN');
+        const totalRows = await copyToStaging(client, config, schema, stagingTable, rows);
+        if (totalRows > 0) {
+            await client.query(buildMergeSQL(config, schema, stagingTable));
+        }
+        await client.query('COMMIT');
+        return totalRows;
+    } catch (err) {
+        await client.query('ROLLBACK').catch(() => {});
+        throw err;
+    } finally {
+        client.release();
+    }
+}
+
 module.exports = {
     ensureTableExists,
     upsertBatch,
+    copyAndMerge,
     computeSafeBatchSize,
     buildUpsertSQL,
+    buildCopySQL,
+    buildMergeSQL,
     buildCreateTableSQL,
     diffSchema,
     isCompatibleType,

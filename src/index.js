@@ -4,7 +4,7 @@ const { Pool } = require('pg');
 
 const { loadConfig } = require('./config');
 const { executeQuery } = require('./athena');
-const { ensureTableExists, upsertBatch, computeSafeBatchSize } = require('./postgres');
+const { ensureTableExists, upsertBatch, copyAndMerge, computeSafeBatchSize } = require('./postgres');
 const { ensureWatermarkTable, getWatermark, saveWatermark } = require('./watermark');
 const { acquireRunLock, releaseRunLock } = require('./lock');
 const logger = require('./logger');
@@ -114,11 +114,38 @@ async function processTable(tableConfig, settings) {
 
     const sql = buildSelect(tableConfig, previousWatermark);
     const sourceColumns = tableConfig.columns.map((column) => column.source);
+    let maxWatermark = previousWatermark ? new Date(previousWatermark) : null;
+
+    if (process.env.POSTGRES_LOAD_MODE === 'copy') {
+        try {
+            const rows = (async function* () {
+                for await (const sourceRow of executeQuery(sql, sourceColumns)) {
+                    const targetRow = mapRow(tableConfig, sourceRow);
+                    const rowWatermark = getRowWatermark(tableConfig, sourceRow);
+                    if (rowWatermark && (!maxWatermark || rowWatermark > maxWatermark)) {
+                        maxWatermark = rowWatermark;
+                    }
+                    yield targetRow;
+                }
+            })();
+
+            const totalRows = await copyAndMerge(db, tableConfig, settings.postgresSchema, rows);
+            if (tableConfig.watermark?.enabled && maxWatermark) {
+                await saveWatermark(db, tableConfig.sourceTable, maxWatermark);
+                logger.info(`[${tableConfig.targetTable}] New watermark: ${maxWatermark.toISOString()}`);
+            }
+            const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
+            logger.success(`${tableConfig.sourceTable} completed. Rows processed: ${totalRows}. Time: ${elapsedSeconds}s`);
+            return;
+        } catch (err) {
+            logger.error(`Error while loading ${tableConfig.sourceTable}`, err);
+            throw err;
+        }
+    }
 
     const batch = [];
     let totalRows = 0;
     let batchNumber = 0;
-    let maxWatermark = previousWatermark ? new Date(previousWatermark) : null;
 
     try {
         for await (const sourceRow of executeQuery(sql, sourceColumns)) {
